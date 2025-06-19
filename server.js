@@ -14,6 +14,7 @@ import authRoutes from './routes/authRoutes.js';
 import providerRoutes from './routes/providerRoutes.js';
 import jobRoutes from './routes/jobRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
+import aiSmartMatchingRoutes from './routes/aiSmartMatchingRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 
 // ES modules dirname fix
@@ -72,6 +73,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/providers', providerRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/ai-smart-matching', aiSmartMatchingRoutes);
 app.use('/api/admin', adminRoutes);
 
 // Root endpoint
@@ -86,6 +88,7 @@ app.get('/', (req, res) => {
       providers: '/api/providers',
       jobs: '/api/jobs',
       ai: '/api/ai',
+      aiSmartMatching: '/api/ai-smart-matching',
       admin: '/api/admin'
     }
   });
