@@ -1,5 +1,6 @@
 import express from 'express';
 import { body } from 'express-validator';
+import multer from 'multer';
 
 import {
   extractTags,
@@ -7,12 +8,26 @@ import {
   matchJob,
   generateTags,
   recommendProviders,
-  getProfileInsights
+  getProfileInsights,
+  analyzeProject
 } from '../controllers/aiController.js';
 
 import { authenticate, optionalAuth } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
+
+// Configure multer for image uploads
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed'));
+    }
+  }
+});
 
 // Validation rules
 const extractTagsValidation = [
@@ -112,6 +127,13 @@ router.get('/recommend-providers', optionalAuth, recommendProviders);
  * @access  Private (Provider owner)
  */
 router.get('/profile-insights/:providerId', authenticate, getProfileInsights);
+
+/**
+ * @route   POST /api/ai/analyze-project
+ * @desc    Analyze project with images using Gemini AI
+ * @access  Public
+ */
+router.post('/analyze-project', upload.array('images', 5), analyzeProject);
 
 // Mock AI responses for quality-focused features
 // In production, these would integrate with OpenAI or similar services

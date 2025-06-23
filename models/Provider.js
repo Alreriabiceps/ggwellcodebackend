@@ -1,341 +1,400 @@
 import mongoose from 'mongoose';
 
-const ProviderSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+const portfolioSchema = new mongoose.Schema({
+  title: {
+    type: String,
     required: true
   },
+  description: {
+    type: String,
+    required: true
+  },
+  images: [{
+    type: String // Image URLs/paths
+  }],
+  completedDate: {
+    type: Date,
+    required: true
+  },
+  cost: {
+    type: Number,
+    required: true
+  },
+  client: {
+    type: String // Client name (anonymized)
+  }
+});
+
+const badgesSchema = new mongoose.Schema({
+  verified: {
+    type: Boolean,
+    default: false
+  },
+  featured: {
+    type: Boolean,
+    default: false
+  },
+  topRated: {
+    type: Boolean,
+    default: false
+  },
+  fastResponse: {
+    type: Boolean,
+    default: false
+  },
+  emergency: {
+    type: Boolean,
+    default: false
+  },
+  expert: {
+    type: Boolean,
+    default: false
+  },
+  licensed: {
+    type: Boolean,
+    default: false
+  },
+  specialist: {
+    type: Boolean,
+    default: false
+  },
+  eco_friendly: {
+    type: Boolean,
+    default: false
+  },
+  artisan: {
+    type: Boolean,
+    default: false
+  }
+});
+
+const priceRangeSchema = new mongoose.Schema({
+  min: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  max: {
+    type: Number,
+    required: true,
+    min: 0
+  }
+});
+
+const locationSchema = new mongoose.Schema({
+  municipality: {
+    type: String,
+    required: true,
+    enum: [
+      'Abucay', 'Bagac', 'Balanga', 'Dinalupihan', 'Hermosa',
+      'Limay', 'Mariveles', 'Morong', 'Orani', 'Orion', 'Pilar', 'Samal'
+    ]
+  },
+  barangay: {
+    type: String,
+    required: true
+  },
+  address: {
+    type: String,
+    required: true
+  },
+  coordinates: {
+    latitude: Number,
+    longitude: Number
+  }
+});
+
+const providerSchema = new mongoose.Schema({
+  // Basic Information
   businessName: {
     type: String,
-    required: [true, 'Business name is required'],
+    required: true,
     trim: true,
-    maxlength: [150, 'Business name cannot exceed 150 characters']
+    maxlength: 100
   },
-  businessDescription: {
+  ownerName: {
     type: String,
-    required: [true, 'Business description is required'],
-    maxlength: [1000, 'Description cannot exceed 1000 characters']
+    required: true,
+    trim: true,
+    maxlength: 100
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true
+  },
+  phone: {
+    type: String,
+    required: true,
+    trim: true
+  },
+
+  // Location
+  municipality: {
+    type: String,
+    required: true,
+    enum: [
+      'Abucay', 'Bagac', 'Balanga', 'Dinalupihan', 'Hermosa',
+      'Limay', 'Mariveles', 'Morong', 'Orani', 'Orion', 'Pilar', 'Samal'
+    ]
+  },
+  barangay: {
+    type: String,
+    required: true
+  },
+  address: {
+    type: String,
+    required: true
+  },
+
+  // Service Information
+  category: {
+    type: String,
+    required: true,
+    enum: [
+      'Plumbing', 'Electrical', 'Construction', 'Appliance Repair',
+      'Cleaning', 'Carpentry', 'Landscaping', 'Painting', 'Roofing',
+      'HVAC', 'Security', 'Interior Design', 'Pest Control', 'Moving'
+    ]
   },
   services: [{
-    name: {
-      type: String,
-      required: true,
-      trim: true
-    },
-    category: {
-      type: String,
-      required: true,
-      enum: [
-        'Construction',
-        'Electrical',
-        'Plumbing',
-        'Carpentry',
-        'Painting',
-        'Roofing',
-        'Landscaping',
-        'Cleaning',
-        'HVAC',
-        'Solar Installation',
-        'Renovation',
-        'Masonry',
-        'Welding',
-        'Interior Design',
-        'Security Systems',
-        'Other'
-      ]
-    },
-    description: String,
-    priceRange: {
-      min: Number,
-      max: Number,
-      unit: {
-        type: String,
-        enum: ['per_hour', 'per_day', 'per_project', 'per_sqm'],
-        default: 'per_project'
-      }
-    }
+    type: String,
+    required: true
   }],
   specialties: [{
+    type: String
+  }],
+
+  // Experience & Ratings
+  yearsExperience: {
+    type: Number,
+    required: true,
+    min: 0,
+    max: 50
+  },
+  rating: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 5
+  },
+  reviewCount: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  completionRate: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 100
+  },
+
+  // Operational Details
+  responseTime: {
     type: String,
-    trim: true
+    default: "2 hours"
+  },
+  workingHours: {
+    type: String,
+    default: "8:00 AM - 5:00 PM"
+  },
+  priceRange: priceRangeSchema,
+
+  // Verification & Badges
+  badges: badgesSchema,
+
+  // Portfolio
+  portfolio: [portfolioSchema],
+
+  // Credentials
+  certifications: [{
+    type: String
   }],
-  experience: {
-    years: {
-      type: Number,
-      min: 0,
-      max: 50
-    },
-    description: String
+  insurance: {
+    type: Boolean,
+    default: false
   },
-  location: {
-    barangay: {
-      type: String,
-      required: [true, 'Barangay is required']
-    },
-    municipality: {
-      type: String,
-      default: 'Bataan'
-    },
-    address: String,
-    coordinates: {
-      latitude: {
-        type: Number,
-        required: [true, 'Latitude is required'],
-        min: -90,
-        max: 90
-      },
-      longitude: {
-        type: Number,
-        required: [true, 'Longitude is required'],
-        min: -180,
-        max: 180
-      }
-    },
-    serviceRadius: {
-      type: Number,
-      default: 15, // km
-      min: 1,
-      max: 100
-    }
+  warranty: {
+    type: String
   },
-  contact: {
-    phone: {
-      type: String,
-      required: [true, 'Phone number is required'],
-      match: [/^(\+639|09)\d{9}$/, 'Please enter a valid Philippine phone number']
-    },
-    email: String,
-    website: String,
-    facebook: String
-  },
-  portfolio: [{
-    title: String,
-    description: String,
-    images: [String],
-    completedDate: Date,
-    projectValue: Number,
-    clientTestimonial: String
+  languages: [{
+    type: String,
+    default: ['Filipino']
   }],
-  badges: [{
-    type: {
-      type: String,
-      enum: [
-        'verified',
-        'top_rated',
-        'experienced',
-        'quick_response',
-        'budget_friendly',
-        'premium_service',
-        'eco_friendly',
-        'emergency_service'
-      ]
-    },
-    earnedDate: {
-      type: Date,
-      default: Date.now
-    },
-    description: String
-  }],
-  ratings: {
-    average: {
-      type: Number,
-      default: 0,
-      min: 0,
-      max: 5
-    },
-    count: {
-      type: Number,
-      default: 0
-    },
-    breakdown: {
-      five: { type: Number, default: 0 },
-      four: { type: Number, default: 0 },
-      three: { type: Number, default: 0 },
-      two: { type: Number, default: 0 },
-      one: { type: Number, default: 0 }
-    }
+
+  // Business Details
+  businessRegistration: {
+    type: String // DTI/SEC registration number
   },
-  availability: {
-    status: {
-      type: String,
-      enum: ['available', 'busy', 'unavailable'],
-      default: 'available'
-    },
-    schedule: {
-      monday: { start: String, end: String, available: { type: Boolean, default: true } },
-      tuesday: { start: String, end: String, available: { type: Boolean, default: true } },
-      wednesday: { start: String, end: String, available: { type: Boolean, default: true } },
-      thursday: { start: String, end: String, available: { type: Boolean, default: true } },
-      friday: { start: String, end: String, available: { type: Boolean, default: true } },
-      saturday: { start: String, end: String, available: { type: Boolean, default: true } },
-      sunday: { start: String, end: String, available: { type: Boolean, default: false } }
-    },
-    responseTime: {
-      type: String,
-      enum: ['within_hour', 'within_day', 'within_week'],
-      default: 'within_day'
-    }
+  taxId: {
+    type: String // TIN
   },
-  pricing: {
-    structure: {
-      type: String,
-      enum: ['hourly', 'daily', 'project_based', 'consultation'],
-      default: 'project_based'
-    },
-    consultation: {
-      free: { type: Boolean, default: true },
-      fee: Number
-    }
+  
+  // AI Enhancement Fields
+  aiScore: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 100
   },
-  verification: {
-    isVerified: {
-      type: Boolean,
-      default: false
-    },
-    documents: [{
-      type: {
-        type: String,
-        enum: ['business_permit', 'tax_id', 'insurance', 'certification', 'portfolio']
-      },
-      url: String,
-      status: {
-        type: String,
-        enum: ['pending', 'approved', 'rejected'],
-        default: 'pending'
-      },
-      uploadedAt: {
-        type: Date,
-        default: Date.now
-      }
-    }],
-    verifiedAt: Date,
-    verifiedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
-    }
+  lastAIAnalysis: {
+    type: Date
   },
-  statistics: {
-    profileViews: { type: Number, default: 0 },
-    jobMatches: { type: Number, default: 0 },
-    projectsCompleted: { type: Number, default: 0 },
-    responseRate: { type: Number, default: 0 }, // percentage
-    lastActiveDate: { type: Date, default: Date.now }
+  aiInsights: {
+    strengths: [String],
+    improvements: [String],
+    marketPosition: String
   },
-  aiTags: [{
-    tag: String,
-    confidence: Number,
-    generatedAt: {
-      type: Date,
-      default: Date.now
-    }
-  }],
+
+  // Status
   isActive: {
     type: Boolean,
     default: true
   },
-  isPremium: {
+  isVerified: {
     type: Boolean,
     default: false
   },
-  premiumExpiresAt: Date
+  verifiedAt: {
+    type: Date
+  },
+  joinedAt: {
+    type: Date,
+    default: Date.now
+  },
+
+  // Performance Metrics
+  totalJobs: {
+    type: Number,
+    default: 0
+  },
+  completedJobs: {
+    type: Number,
+    default: 0
+  },
+  cancelledJobs: {
+    type: Number,
+    default: 0
+  },
+  averageResponseTime: {
+    type: Number, // in minutes
+    default: 120
+  },
+
+  // Social Proof
+  testimonials: [{
+    client: String,
+    rating: Number,
+    comment: String,
+    date: Date,
+    jobType: String
+  }],
+
+  // Contact Preferences
+  preferredContact: {
+    type: String,
+    enum: ['phone', 'email', 'sms', 'whatsapp'],
+    default: 'phone'
+  },
+  availability: {
+    monday: { type: Boolean, default: true },
+    tuesday: { type: Boolean, default: true },
+    wednesday: { type: Boolean, default: true },
+    thursday: { type: Boolean, default: true },
+    friday: { type: Boolean, default: true },
+    saturday: { type: Boolean, default: true },
+    sunday: { type: Boolean, default: false }
+  }
 }, {
   timestamps: true,
   toJSON: { virtuals: true },
   toObject: { virtuals: true }
 });
 
-// Indexes for better query performance
-ProviderSchema.index({ 'location.coordinates': '2dsphere' });
-ProviderSchema.index({ 'services.category': 1 });
-ProviderSchema.index({ 'location.barangay': 1 });
-ProviderSchema.index({ 'ratings.average': -1 });
-ProviderSchema.index({ 'verification.isVerified': 1 });
-ProviderSchema.index({ isActive: 1 });
-ProviderSchema.index({ createdAt: -1 });
+// Indexes for performance
+providerSchema.index({ municipality: 1, category: 1 });
+providerSchema.index({ rating: -1, reviewCount: -1 });
+providerSchema.index({ 'badges.verified': 1 });
+providerSchema.index({ services: 1 });
+providerSchema.index({ isActive: 1, isVerified: 1 });
 
 // Virtual for full address
-ProviderSchema.virtual('fullAddress').get(function() {
-  const parts = [this.location.address, this.location.barangay, this.location.municipality];
-  return parts.filter(Boolean).join(', ');
+providerSchema.virtual('fullAddress').get(function() {
+  return `${this.address}, ${this.barangay}, ${this.municipality}, Bataan`;
 });
 
-// Virtual for service categories list
-ProviderSchema.virtual('serviceCategories').get(function() {
-  return [...new Set(this.services.map(service => service.category))];
+// Virtual for success rate
+providerSchema.virtual('successRate').get(function() {
+  if (this.totalJobs === 0) return 0;
+  return Math.round((this.completedJobs / this.totalJobs) * 100);
 });
 
-// Method to calculate distance from a point
-ProviderSchema.methods.distanceFrom = function(latitude, longitude) {
-  const R = 6371; // Earth's radius in km
-  const dLat = (latitude - this.location.coordinates.latitude) * Math.PI/180;
-  const dLon = (longitude - this.location.coordinates.longitude) * Math.PI/180;
-  const a = 
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(this.location.coordinates.latitude * Math.PI/180) * Math.cos(latitude * Math.PI/180) * 
-    Math.sin(dLon/2) * Math.sin(dLon/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  return R * c; // Distance in km
+// Virtual for average rating display
+providerSchema.virtual('ratingDisplay').get(function() {
+  return this.rating.toFixed(1);
+});
+
+// Pre-save middleware
+providerSchema.pre('save', function(next) {
+  // Update completion rate
+  if (this.totalJobs > 0) {
+    this.completionRate = Math.round((this.completedJobs / this.totalJobs) * 100);
+  }
+  
+  // Auto-verify if meets criteria
+  if (this.rating >= 4.5 && this.reviewCount >= 10 && this.completionRate >= 95) {
+    this.badges.topRated = true;
+  }
+  
+  if (this.averageResponseTime <= 30) {
+    this.badges.fastResponse = true;
+  }
+  
+  next();
+});
+
+// Static methods
+providerSchema.statics.findByCategory = function(category) {
+  return this.find({ category, isActive: true, isVerified: true });
 };
 
-// Method to add a badge
-ProviderSchema.methods.addBadge = function(badgeType, description = '') {
-  const existingBadge = this.badges.find(badge => badge.type === badgeType);
-  if (!existingBadge) {
-    this.badges.push({
-      type: badgeType,
-      description,
-      earnedDate: new Date()
-    });
+providerSchema.statics.findByMunicipality = function(municipality) {
+  return this.find({ municipality, isActive: true, isVerified: true });
+};
+
+providerSchema.statics.findTopRated = function(limit = 10) {
+  return this.find({ isActive: true, isVerified: true })
+    .sort({ rating: -1, reviewCount: -1 })
+    .limit(limit);
+};
+
+providerSchema.statics.searchByService = function(service) {
+  return this.find({
+    services: { $regex: service, $options: 'i' },
+    isActive: true,
+    isVerified: true
+  });
+};
+
+// Instance methods
+providerSchema.methods.updateRating = function(newRating) {
+  const totalRating = this.rating * this.reviewCount + newRating;
+  this.reviewCount += 1;
+  this.rating = totalRating / this.reviewCount;
+  return this.save();
+};
+
+providerSchema.methods.addJob = function(completed = false) {
+  this.totalJobs += 1;
+  if (completed) {
+    this.completedJobs += 1;
   }
   return this.save();
 };
 
-// Method to update statistics
-ProviderSchema.methods.incrementViews = function() {
-  this.statistics.profileViews += 1;
-  this.statistics.lastActiveDate = new Date();
-  return this.save({ validateBeforeSave: false });
-};
-
-// Static method for proximity search
-ProviderSchema.statics.findNearby = function(latitude, longitude, radiusInKm = 15, filters = {}) {
-  const query = {
-    isActive: true,
-    'location.coordinates': {
-      $near: {
-        $geometry: {
-          type: 'Point',
-          coordinates: [longitude, latitude]
-        },
-        $maxDistance: radiusInKm * 1000 // Convert to meters
-      }
-    },
-    ...filters
-  };
-  
-  return this.find(query).populate('user', 'name email profileImage');
-};
-
-// Static method for service matching
-ProviderSchema.statics.findByServices = function(serviceCategories, location = null, limit = 10) {
-  let query = {
-    isActive: true,
-    'services.category': { $in: serviceCategories }
-  };
-  
-  let findQuery = this.find(query).populate('user', 'name email profileImage');
-  
-  if (location) {
-    findQuery = findQuery.near('location.coordinates', {
-      center: [location.longitude, location.latitude],
-      maxDistance: 50000 // 50km in meters
-    });
-  }
-  
-  return findQuery.limit(limit).sort({ 'ratings.average': -1, createdAt: -1 });
-};
-
-const Provider = mongoose.model('Provider', ProviderSchema);
+const Provider = mongoose.model('Provider', providerSchema);
 
 export default Provider; 

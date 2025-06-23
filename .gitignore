@@ -6,6 +6,17 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Environment variables (CRITICAL - NEVER COMMIT THESE!)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs
+*.log
+
 # Runtime data
 pids
 *.pid
@@ -64,32 +75,53 @@ jspm_packages/
 # Yarn Integrity file
 .yarn-integrity
 
-# Environment variables
+# dotenv environment variables file
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env.example
 
-# parcel-bundler cache (https://parceljs.org/)
-.cache
-.parcel-cache
+# Build outputs
+dist/
+build/
 
-# Next.js build output
-.next
-out
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
 
-# Nuxt.js build / generate output
-.nuxt
-dist
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-# Gatsby files
-.cache/
-public
+# Uploads
+uploads/*
+!uploads/.gitkeep
 
-# Vuepress build output
-.vuepress/dist
+# API Keys and Secrets (EXTRA PROTECTION)
+**/api-keys.js
+**/secrets.js
+**/*secret*
+**/*key*
+**/*token*
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# MongoDB
+data/
+
+# Redis
+dump.rdb
+
+# Temporary files
+tmp/
+temp/
 
 # Serverless directories
 .serverless/
@@ -112,74 +144,6 @@ public
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-
-# Logs
-logs
-*.log
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
-# MongoDB
-data/
-
-# Redis
-dump.rdb
-
-# Uploads
-uploads/
-public/uploads/
-
-# Temporary files
-tmp/
-temp/
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# Build directories
-build/
-dist/
-
-# SSL certificates
-*.pem
-*.key
-*.crt
-
-# Docker
-.dockerignore
-Dockerfile.dev
-
-# AWS
-.aws/
-
-# Terraform
-*.tfstate
-*.tfstate.*
-.terraform/
-
-# Local configuration files
-config/local.json
-config/development.json
-config/production.json
-
-# Session files
-sessions/
 
 # Cache files
 .cache/
@@ -226,3 +190,4 @@ __pycache__/
 config/database.json
 keys/
 certificates/
+".env" 

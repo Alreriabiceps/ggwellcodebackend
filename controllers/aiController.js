@@ -575,11 +575,117 @@ export const getProfileInsights = async (req, res) => {
   }
 };
 
+/**
+ * 🚀 ANALYZE PROJECT WITH IMAGES - Real Gemini AI Analysis
+ * POST /api/ai/analyze-project
+ */
+export const analyzeProject = async (req, res) => {
+  try {
+    console.log('\n🎯 =================================');
+    console.log('🚀 AI PROJECT ANALYSIS ENDPOINT HIT');
+    console.log('🎯 =================================');
+
+    const { description, budget, timeline, location, hasImages } = req.body;
+    const images = req.files; // Multer provides uploaded files
+
+    console.log('📊 Request Data:', {
+      description: description?.substring(0, 100) + '...',
+      budget,
+      timeline,
+      location,
+      hasImages,
+      imageCount: images ? images.length : 0
+    });
+
+    // Import Gemini AI service
+    const GeminiAIService = (await import('../services/geminiAI.js')).default;
+
+    const projectData = {
+      description: description || 'Project analysis from uploaded images',
+      budget: budget || 'Open budget',
+      timeline: timeline || 'Flexible',
+      location: location || 'Bataan, Philippines'
+    };
+
+    let analysisResult;
+
+    // 📸 HANDLE IMAGE ANALYSIS
+    if (images && images.length > 0) {
+      console.log('🖼️  Processing', images.length, 'images with Gemini Vision AI');
+      
+      // Process first image with Gemini Vision
+      const firstImage = images[0];
+      const imageData = {
+        data: firstImage.buffer.toString('base64'),
+        mimeType: firstImage.mimetype
+      };
+
+      // Use the enhanced project analyzer with image analysis
+      analysisResult = await GeminiAIService.analyzeProjectWithImage(projectData, imageData);
+    } else {
+      // 📝 TEXT-ONLY ANALYSIS
+      console.log('📝 Processing text-only analysis with Gemini AI');
+      analysisResult = await GeminiAIService.analyzeProject(projectData);
+    }
+
+    console.log('✅ Analysis complete:', {
+      success: analysisResult.success,
+      hasImageAnalysis: !!analysisResult.imageAnalysis,
+      realAI: analysisResult.analysis?.realAI
+    });
+
+    // Format response for frontend
+    const response = {
+      success: analysisResult.success,
+      projectAnalysis: {
+        category: analysisResult.analysis?.detectedCategory || analysisResult.analysis?.detectedServices?.[0] || 'General Construction',
+        services: analysisResult.analysis?.detectedServices || [],
+        estimatedCost: analysisResult.analysis?.estimatedCost || { min: 1000, max: 10000, currency: 'PHP' },
+        complexity: analysisResult.analysis?.complexityScore ? 
+          (analysisResult.analysis.complexityScore <= 3 ? 'Low' : 
+           analysisResult.analysis.complexityScore <= 6 ? 'Medium' : 'High') : 'Medium',
+        timeEstimate: analysisResult.analysis?.timeframe || '1-7 days',
+        aiConfidence: analysisResult.analysis?.aiConfidence || 0.85,
+        detectedKeywords: analysisResult.analysis?.detectedServices || [],
+        realAI: analysisResult.analysis?.realAI || false,
+        geminiAnalysis: analysisResult.analysis?.realAI || false,
+        demoMode: analysisResult.analysis?.demoMode || false,
+        analysisType: images && images.length > 0 ? 'Image + Text' : 'Text Only'
+      },
+      matches: [], // Would be populated with actual provider matching
+      searchStats: {
+        totalProviders: 0,
+        aiConfidence: analysisResult.analysis?.aiConfidence || 0.85,
+        processingTime: analysisResult.analysis?.realAI ? '2.5s' : '0.1s',
+        realAI: analysisResult.analysis?.realAI || false
+      },
+      imageAnalysis: analysisResult.imageAnalysis,
+      backendAPI: true,
+      timestamp: new Date().toISOString()
+    };
+
+    console.log('🎯 =================================\n');
+
+    res.json(response);
+
+  } catch (error) {
+    console.error('❌ AI Analysis Error:', error);
+    
+    res.status(500).json({
+      success: false,
+      message: 'AI analysis failed',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'AI service temporarily unavailable',
+      fallback: true
+    });
+  }
+};
+
 export default {
   extractTags,
   enhanceProfile,
   matchJob,
   generateTags,
   recommendProviders,
-  getProfileInsights
+  getProfileInsights,
+  analyzeProject
 }; 
