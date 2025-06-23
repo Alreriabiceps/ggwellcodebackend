@@ -1,0 +1,4 @@
+GEMINI_API_KEY=AIzaSyBwBanmTSBrJ9YZZ9Xpio3GkaM2ANb-Mz4
+MONGODB_URI=mongodb://localhost:27017/bataan-connect 
+PORT=5001 
+NODE_ENV=development 
