@@ -436,7 +436,7 @@ const seedDatabase = async () => {
   try {
     console.log(`
     ============================================================
-    🌱 BATAAN CONNECT DATABASE SEEDING STARTED
+    🌱 REKOMENDITO DATABASE SEEDING STARTED
     ============================================================
     `);
 

@@ -1,7 +1,7 @@
 {
   "name": "bataan-connect-backend",
   "version": "1.0.0",
-  "description": "Backend API for Bataan Connect - Smart Contractor & MSME Discovery Platform",
+  "description": "Backend API for Rekomendito - Smart Provider Discovery Platform",
   "main": "server.js",
   "type": "module",
   "scripts": {
@@ -34,6 +34,6 @@
     "discovery",
     "platform"
   ],
-  "author": "Bataan Connect Team",
+  "author": "Rekomendito Team",
   "license": "MIT"
 }

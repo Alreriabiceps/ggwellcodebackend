@@ -9,26 +9,23 @@ import { fileURLToPath } from 'url';
 // Import database connection
 import connectDB from './config/db.js';
 
-// Import routes
-import authRoutes from './routes/authRoutes.js';
-import providerRoutes from './routes/providerRoutes.js';
-import jobRoutes from './routes/jobRoutes.js';
-import aiRoutes from './routes/aiRoutes.js';
-import aiSmartMatchingRoutes from './routes/aiSmartMatchingRoutes.js';
-import adminRoutes from './routes/adminRoutes.js';
-
-// ES modules dirname fix
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 // Load environment variables
 dotenv.config();
+
+// Set a default JWT_SECRET if not provided in .env for development purposes
+if (!process.env.JWT_SECRET) {
+  process.env.JWT_SECRET = 'your-default-jwt-secret-for-development';
+}
 
 // Initialize Express app
 const app = express();
 
 // Connect to MongoDB
 connectDB();
+
+// Get __dirname for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Security middleware
 app.use(helmet());
@@ -45,9 +42,7 @@ app.use('/api/', limiter);
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://bataan-connect.vercel.app'] 
-    : ['http://localhost:3000', 'http://localhost:5173'],
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
   credentials: true
 }));
 
@@ -58,13 +53,21 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Static files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Routes - Updated to use module structure
+import authRoutes from './modules/auth/authRoutes.js';
+import providerRoutes from './routes/providerRoutes.js';
+import jobRoutes from './routes/jobRoutes.js';
+import aiRoutes from './routes/aiRoutes.js';
+import aiSmartMatchingRoutes from './routes/aiSmartMatchingRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.status(200).json({
-    status: 'OK',
-    message: 'Bataan Connect API is running!',
+  res.json({
+    success: true,
+    message: 'Rekomendito API is running!',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV
+    environment: process.env.NODE_ENV || 'development'
   });
 });
 
@@ -76,14 +79,14 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/ai-smart-matching', aiSmartMatchingRoutes);
 app.use('/api/admin', adminRoutes);
 
-// Root endpoint
+// Welcome route
 app.get('/', (req, res) => {
   res.json({
-    message: '🚀 Welcome to Bataan Connect API',
+    success: true,
+    message: '🚀 Welcome to Rekomendito API',
     version: '1.0.0',
-    description: 'Smart Contractor & MSME Discovery Platform',
+    description: 'Smart Provider Discovery Platform for Bataan Province',
     endpoints: {
-      health: '/health',
       auth: '/api/auth',
       providers: '/api/providers',
       jobs: '/api/jobs',
@@ -94,39 +97,33 @@ app.get('/', (req, res) => {
   });
 });
 
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({
-    error: 'Endpoint not found',
-    message: `Route ${req.originalUrl} does not exist`
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    success: false,
+    message: 'Something went wrong!',
+    error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
   });
 });
 
-// Global error handler
-app.use((err, req, res, next) => {
-  console.error('Error stack:', err.stack);
-  
-  const statusCode = err.statusCode || err.status || 500;
-  const message = err.message || 'Internal Server Error';
-  
-  res.status(statusCode).json({
-    error: message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'Route not found'
   });
 });
 
 // Start server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`
-  ============================================================
-  🚀 BATAAN CONNECT API SERVER STARTED
-  ============================================================
-  📡 Server running on port: ${PORT}
-  🌍 Environment: ${process.env.NODE_ENV || 'development'}
-  📅 Started at: ${new Date().toLocaleString()}
-  ============================================================
+🚀 REKOMENDITO API SERVER STARTED
+📡 Server running on port ${PORT}
+🌐 Environment: ${process.env.NODE_ENV || 'development'}
+📊 Database: ${process.env.MONGODB_URI ? 'Connected' : 'Not configured'}
+🔑 JWT Secret: ${process.env.JWT_SECRET ? 'Configured' : 'Not configured'}
+⚡ Gemini AI: ${process.env.GEMINI_API_KEY ? 'Configured' : 'Not configured'}
   `);
-});
-
-export default app; 
+  }); 

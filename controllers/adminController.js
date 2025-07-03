@@ -250,7 +250,7 @@ export const verifyProvider = async (req, res) => {
       provider.verification.verifiedBy = adminId;
       
       // Add verified badge
-      await provider.addBadge('verified', 'Verified by Bataan Connect team');
+              await provider.addBadge('verified', 'Verified by Rekomendito team');
     }
 
     await provider.save();

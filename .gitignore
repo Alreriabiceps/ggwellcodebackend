@@ -185,7 +185,7 @@ __pycache__/
 *.tar
 *.zip
 
-# Bataan Connect specific
+# Rekomendito specific
 # Add any project-specific files here
 config/database.json
 keys/
